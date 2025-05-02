@@ -89,7 +89,7 @@ export function setupIPC(win, store) {
   })
   let ocrInstance = setupOCR(win)
   setupASR(win)
-  setupASRModelManager(win)
+  // setupASRModelManager(win)
   setupNedb()
   setupShortcut(win, sender, ocrInstance)
   setupTranslateIpc()
