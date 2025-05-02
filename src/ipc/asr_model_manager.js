@@ -1,7 +1,9 @@
 import { rimraf } from 'rimraf'
 import { download } from 'electron-dl';
 import logger from '../utils/logger';
-
+import { getASRProcess, setAsrConfig } from './asr.js';
+import { join } from 'path'
+import { app } from 'electron';
 const fs = require('fs');
 const path = require('path');
 const tar = require('tar');
@@ -137,4 +139,34 @@ export function setupASRModelManager(win) {
     });
 
     logger.info('ASR 模型管理器设置完成');
+    startAsr();
+}
+
+
+export async function startAsr() {
+    let asrProcess = getASRProcess();
+    let data = {"device":-1,"model":"sherpa-onnx-paraformer-zh-2024-03-09","modelDir":"C:\\Users\\samuz\\local_git_projects\\local_documents\\asr_models"};
+    // Test-locally
+    logger.info('收到启动 ASR 请求 V2', {data});
+    setAsrConfig(data);
+    if (!asrProcess.exist()) {
+      // 读取替换规则文件
+      if (data.modelDir) {
+        try {
+        //   const ruleContent = await fs.readFile(path.join(data.modelDir, 'rules.json'), 'utf-8');
+        //   replacementRules = JSON.parse(ruleContent);
+        //   logger.info('成功读取替换规则', { rules: replacementRules });
+        } catch (error) {
+          logger.error('读取替换规则文件失败', { error });
+        }
+      }
+
+      asrProcess.start()
+      asrProcess.send({ ...data, logPath: join(app.getPath('userData'), 'logs') });
+      logger.info('ASR 进程已启动并发送数据');
+      return true;
+    } else {
+      logger.warn('ASR 进程已存在，无法启动新进程');
+      return false;
+    }
 }

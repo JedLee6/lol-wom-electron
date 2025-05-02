@@ -63,6 +63,8 @@ export function setupShortcut(win, sender, ocrInstance) {
     let shortcutProcess = new ChildProcessManager(path.join(__dirname, '../../child_process/nut/handle_nut.js'))
     shortcutProcess.start()
     logger.info('快捷键子进程已启动');
+    //todo 发送消息
+    // win.webContents.send('start-asr', {"device":-1,"model":"sherpa-onnx-paraformer-zh-2024-03-09","modelDir":"C:\\Users\\samuz\\local_git_projects\\local_documents\\asr_models"})
 
     // 注册默认的快捷键
     // currentStatus['PAGE UP'] = '';

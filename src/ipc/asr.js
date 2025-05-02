@@ -11,11 +11,17 @@ import { app } from 'electron';
 import fs from 'fs/promises';
 
 let replacementRules = {};
+
+// Move asrProcess outside the setupASR function
+let asrProcess;
+let asr_config = {}
+
+
 export function setupASR(win) {
   logger.info('开始设置 ASR');
   let lyricsWindow
-  let asr_config = {}
-  let asrProcess = new ChildProcessManager(path.join(__dirname, '../../child_process/asr_process/asr_process.js'))
+  asr_config = {}
+  asrProcess = new ChildProcessManager(path.join(__dirname, '../../child_process/asr_process/asr_process.js'))
 
 
   asrProcess.on('message', (res) => {
@@ -42,8 +48,9 @@ export function setupASR(win) {
     asrProcess.stop();
     logger.info('ASR 进程退出');
   });
-
+  // `ipcMain.handle` is designed to handle `invoke` requests from the renderer process.
   ipcMain.handle('start-asr', async (_, data) => {
+    //todo
     logger.info('收到启动 ASR 请求', { data });
     asr_config = data
     if (!asrProcess.exist()) {
@@ -176,4 +183,17 @@ function applyReplacementRules(message) {
     processedMessage = processedMessage.replace(new RegExp(key, 'g'), value);
   }
   return processedMessage;
+}
+
+// Create a getter function
+export function getASRProcess() {
+  return asrProcess;
+}
+
+export function setAsrConfig(config) {
+  asr_config = config;
+}
+
+export function getAsrConfig() {
+  return replacementRules;
 }
